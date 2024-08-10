@@ -1,0 +1,223 @@
+-- Load Kavo UI Library
+local success, Kavo = pcall(function()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+end)
+
+if not success then
+    warn("Failed to load Kavo UI Library.")
+    return
+end
+
+-- Loading Animation UI
+local function createLoadingUI()
+    local assetID = 14368202425
+    local loadingUI = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)
+    loadingUI.Name = "LoadingUI"
+
+    local frame = Instance.new("Frame", loadingUI)
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    frame.BackgroundTransparency = 0.5
+    frame.BorderSizePixel = 0
+
+    local image = Instance.new("ImageLabel", frame)
+    image.Size = UDim2.new(0.5, 0, 0.5, 0)
+    image.Position = UDim2.new(0.25, 0, 0.25, 0)
+    image.Image = "rbxassetid://" .. assetID
+    image.BackgroundTransparency = 1
+
+    local startButton = Instance.new("TextButton", frame)
+    startButton.Size = UDim2.new(0.2, 0, 0.1, 0)
+    startButton.Position = UDim2.new(0.4, 0, 0.7, 0)
+    startButton.Text = "Start Execute"
+    startButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    startButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+    local consoleButton = Instance.new("TextButton", frame)
+    consoleButton.Size = UDim2.new(0.2, 0, 0.1, 0)
+    consoleButton.Position = UDim2.new(0.2, 0, 0.7, 0)
+    consoleButton.Text = "Console Logs"
+    consoleButton.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+    consoleButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+
+    local closeButton = Instance.new("TextButton", frame)
+    closeButton.Size = UDim2.new(0.2, 0, 0.1, 0)
+    closeButton.Position = UDim2.new(0.4, 0, 0.8, 0)
+    closeButton.Text = "Close"
+    closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+    local openButton = Instance.new("TextButton", game.Players.LocalPlayer.PlayerGui)
+    openButton.Size = UDim2.new(0.1, 0, 0.1, 0)
+    openButton.Position = UDim2.new(0.9, 0, 0, 0)
+    openButton.Text = "Open"
+    openButton.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
+    openButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+    closeButton.MouseButton1Click:Connect(function()
+        loadingUI.Visible = false
+    end)
+
+    openButton.MouseButton1Click:Connect(function()
+        loadingUI.Visible = true
+    end)
+
+    return loadingUI
+end
+
+local loadingUI = createLoadingUI()
+
+-- Error Handling Function
+local function handleError(message)
+    warn("Error: " .. message)
+    local player = game.Players.LocalPlayer
+    if player and player.PlayerGui then
+        local errorGui = Instance.new("ScreenGui", player.PlayerGui)
+        errorGui.Name = "ErrorGui"
+        
+        local errorFrame = Instance.new("Frame", errorGui)
+        errorFrame.Size = UDim2.new(0.5, 0, 0.3, 0)
+        errorFrame.Position = UDim2.new(0.25, 0, 0.35, 0)
+        errorFrame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        errorFrame.BorderSizePixel = 0
+
+        local errorLabel = Instance.new("TextLabel", errorFrame)
+        errorLabel.Size = UDim2.new(1, 0, 1, 0)
+        errorLabel.Text = "An error occurred: " .. message
+        errorLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        errorLabel.BackgroundTransparency = 1
+        errorLabel.TextScaled = true
+
+        local closeButton = Instance.new("TextButton", errorFrame)
+        closeButton.Size = UDim2.new(0.2, 0, 0.1, 0)
+        closeButton.Position = UDim2.new(0.4, 0, 0.85, 0)
+        closeButton.Text = "Close"
+        closeButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+        closeButton.MouseButton1Click:Connect(function()
+            errorGui:Destroy()
+        end)
+    end
+end
+
+-- GUI Setup
+local Window = Kavo:CreateWindow("KAT Script")
+local MainTab = Window:CreateTab("Main")
+local ESPTab = Window:CreateTab("ESP")
+local AntiAimTab = Window:CreateTab("Anti-Aim Rig")
+
+-- Aimbot Feature
+local AimbotSection = MainTab:CreateSection("Aimbot")
+local AimbotToggle = AimbotSection:CreateToggle("Aimbot", false, function(enabled)
+    _G.AimbotEnabled = enabled
+end)
+
+-- Silent Aim Feature
+local SilentAimSection = MainTab:CreateSection("Silent Aim")
+local SilentAimToggle = SilentAimSection:CreateToggle("Silent Aim", false, function(enabled)
+    _G.SilentAimEnabled = enabled
+end)
+
+-- FOV Circle Feature
+local FOVSection = MainTab:CreateSection("FOV Circle")
+local FOVCircleToggle = FOVSection:CreateToggle("FOV Circle", false, function(enabled)
+    _G.FOVCircleEnabled = enabled
+end)
+local FOVRadius = FOVSection:CreateSlider("FOV Radius", 50, 300, 100, function(value)
+    _G.FOVRadius = value
+end)
+
+-- Anti-Aim Rig Feature
+local AntiAimSection = AntiAimTab:CreateSection("Anti-Aim Rig")
+local AntiAimToggle = AntiAimSection:CreateToggle("Enable Anti-Aim Rig", false, function(enabled)
+    _G.AntiAimRigEnabled = enabled
+    if enabled then
+        -- Create and configure the anti-aim rig for R6
+        local rig = Instance.new("Model", workspace)
+        rig.Name = "AntiAimRig"
+        
+        -- Create R6 parts
+        local parts = {}
+        local jointNames = {"Head", "Torso", "LeftLeg", "RightLeg", "LeftArm", "RightArm"}
+        for _, name in pairs(jointNames) do
+            local part = Instance.new("Part", rig)
+            part.Name = name
+            part.Size = Vector3.new(2, 2, 1)
+            if name == "Head" then
+                part.Size = Vector3.new(2, 1, 1)
+            end
+            part.Anchored = false
+            part.CanCollide = false
+            part.BrickColor = BrickColor.White()
+            part.Transparency = 1
+            part.Material = Enum.Material.SmoothPlastic
+            
+            if name == "Head" then
+                local face = Instance.new("Decal", part)
+                face.Texture = "http://www.robloxlabs.com/transparent-face"
+                face.Face = Enum.NormalId.Front
+            end
+            
+            parts[name] = part
+        end
+
+        -- Create R6 joints
+        local joints = {}
+        for _, joint in pairs({"Neck", "LeftShoulder", "RightShoulder", "LeftLeg", "RightLeg"}) do
+            local hinge = Instance.new("Motor6D", rig)
+            hinge.Name = joint
+            hinge.Part0 = parts["Torso"]
+            hinge.Part1 = parts[joint]
+            hinge.C0 = CFrame.new()
+            hinge.C1 = CFrame.new()
+            joints[joint] = hinge
+        end
+
+        -- Configure the rig to mimic player's actions
+        game:GetService("RunService").RenderStepped:Connect(function()
+            if _G.AntiAimRigEnabled then
+                local player = game.Players.LocalPlayer
+                local char = player.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    for partName, part in pairs(parts) do
+                        local humanoidPart = char:FindFirstChild(partName)
+                        if humanoidPart then
+                            part.CFrame = humanoidPart.CFrame
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        -- Destroy the rig if disabled
+        local rig = workspace:FindFirstChild("AntiAimRig")
+        if rig then
+            rig:Destroy()
+        end
+
+-- ESP Features Section
+local ESPSection = ESPTab:CreateSection("ESP Features")
+
+-- Toggle for ESP
+local ESPToggle = ESPSection:CreateToggle("Enable ESP", false, function(enabled)
+    _G.ESPEnabled = enabled
+    
+    if enabled then
+        local espService = require(game.ReplicatedStorage:WaitForChild("ESPService")) -- Adjust path as needed
+        
+        espService:Enable()  -- Enable ESP service
+        
+        espService:SetESPOptions({
+            Players = true,          -- Show ESP for players
+            Chests = true,           -- Show ESP for chests
+            Items = true,            -- Show ESP for items
+            CustomColor = Color3.fromRGB(255, 0, 0),  -- Set ESP color
+            ShowNames = true         -- Show player names
+        })
+    else
+        local espService = require(game.ReplicatedStorage:WaitForChild("ESPService")) -- Adjust path as needed
+        
+        espService:Disable()  -- Disable ESP service
+    end
+end)
